@@ -90,6 +90,13 @@ class Sweep:
 
     def __enter__(_):
         _.scoped = True
+        return _.open()
+
+    def __exit__(_, *args):
+        _.scoped = False
+        _.close(*args)
+
+    def open(_):
         _.device = None
 
         assert libsweep.sweep_is_abi_compatible(), 'Your installed libsweep is not ABI compatible with these bindings'
@@ -117,14 +124,13 @@ class Sweep:
 
         return _
 
-    def __exit__(_, *args):
-        _.scoped = False
-
+    def close(_, *args):
         if _.device:
             libsweep.sweep_device_destruct(_.device)
 
     def _assert_scoped(_):
-        assert _.scoped, 'Use the `with` statement to guarantee for deterministic resource management'
+        # assert _.scoped, 'Use the `with` statement to guarantee for deterministic resource management'
+        pass
 
     def start_scanning(_):
         _._assert_scoped()
